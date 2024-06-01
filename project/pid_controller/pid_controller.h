@@ -16,18 +16,27 @@ class PID {
   /*
    * Errors
    */
+  double cte;
+  double diff_cte;
+  double int_cte;
 
   /*
    * Coefficients
    */
+  double kp;
+  double ki;
+  double kd;
 
   /*
    * Output limits
    */
+  double output_lim_min;
+  double output_lim_max;
 
   /*
    * Delta time
    */
+  double delta_t;
 
   /*
    * Constructor
@@ -42,13 +51,13 @@ class PID {
   /*
    * Initialize PID.
    */
-  void Init(double Kp, double Ki, double Kd, double output_lim_max,
-            double output_lim_min);
+  void Init(double Kpi, double Kii, double Kdi, double output_lim_maxi,
+            double output_lim_mini);
 
   /*
    * Update the PID error variables given cross track error.
    */
-  void UpdateError(double cte);
+  void UpdateError(double new_cte);
 
   /*
    * Calculate the total PID error.
