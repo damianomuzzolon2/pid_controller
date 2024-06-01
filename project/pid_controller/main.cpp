@@ -229,6 +229,14 @@ int main() {
   PID pid_steer = PID();
   PID pid_throttle = PID();
 
+  const double max_limit_steer{1.2};
+  const double min_limit_steer{-1.2};
+  pid_steer.Init(1.0, 1.0, 1.0, max_limit_steer, min_limit_steer);
+
+  const double max_limit_throttle{1.2};
+  const double min_limit_throttle{-1.2};
+  pid_throttle.Init(1.0, 1.0, 1.0, max_limit_throttle, min_limit_throttle);
+
   h.onMessage([&pid_steer, &pid_throttle, &new_delta_time, &timer, &prev_timer,
                &i, &prev_timer](uWS::WebSocket<uWS::SERVER> ws, char* data,
                                 size_t length, uWS::OpCode opCode) {
