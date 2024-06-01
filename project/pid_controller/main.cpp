@@ -233,8 +233,8 @@ int main() {
   const double min_limit_steer{-1.2};
   pid_steer.Init(1.0, 1.0, 1.0, max_limit_steer, min_limit_steer);
 
-  const double max_limit_throttle{1.2};
-  const double min_limit_throttle{-1.2};
+  const double max_limit_throttle{1};
+  const double min_limit_throttle{-1};
   pid_throttle.Init(1.0, 1.0, 1.0, max_limit_throttle, min_limit_throttle);
 
   h.onMessage([&pid_steer, &pid_throttle, &new_delta_time, &timer, &prev_timer,
@@ -338,7 +338,7 @@ int main() {
        * TODO (step 2): uncomment these lines
        **/
       //           // Update the delta time with the previous command
-      //           pid_throttle.UpdateDeltaTime(new_delta_time);
+      pid_throttle.UpdateDeltaTime(new_delta_time);
 
       // Compute error of speed
       double error_throttle;
@@ -347,7 +347,8 @@ int main() {
        *position and the desired speed
        **/
       // modify the following line for step 2
-      error_throttle = 0;
+      // actual - desired because i added a "-" in the pid code
+      error_throttle = velocity - v_points.back();
 
       double throttle_output;
       double brake_output;
@@ -356,27 +357,27 @@ int main() {
        * TODO (step 2): uncomment these lines
        **/
       //           // Compute control to apply
-      //           pid_throttle.UpdateError(error_throttle);
-      //           double throttle = pid_throttle.TotalError();
+      pid_throttle.UpdateError(error_throttle);
+      double throttle = pid_throttle.TotalError();
 
       //           // Adapt the negative throttle to break
-      //           if (throttle > 0.0) {
-      //             throttle_output = throttle;
-      //             brake_output = 0;
-      //           } else {
-      //             throttle_output = 0;
-      //             brake_output = -throttle;
-      //           }
+      if (throttle > 0.0) {
+        throttle_output = throttle;
+        brake_output = 0;
+      } else {
+        throttle_output = 0;
+        brake_output = -throttle;
+      }
 
       //           // Save data
-      //           file_throttle.seekg(std::ios::beg);
-      //           for(int j=0; j < i - 1; ++j){
-      //               file_throttle.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
-      //           }
-      //           file_throttle  << i ;
-      //           file_throttle  << " " << error_throttle;
-      //           file_throttle  << " " << brake_output;
-      //           file_throttle  << " " << throttle_output << endl;
+      file_throttle.seekg(std::ios::beg);
+      for (int j = 0; j < i - 1; ++j) {
+        file_throttle.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      }
+      file_throttle << i;
+      file_throttle << " " << error_throttle;
+      file_throttle << " " << brake_output;
+      file_throttle << " " << throttle_output << endl;
 
       // Send control
       json msgJson;
